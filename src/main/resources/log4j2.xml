@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" strict="true">
+    <properties>
+        <property name="filePath" value="D:/movies_website/logs"/>
+    </properties>
+
+    <Appenders>
+        <!--Console appender-->
+        <Appender type="Console" name="LOG_TO_CONSOLE">
+            <Layout type="PatternLayout" pattern="%clr{%d{yyyy-MM-dd HH:mm:ss}}{faint} %clr{%level} %clr{}{magenta} %clr{---}{faint} %clr{[%15.15t]}{faint} %clr{%c{1}.%M}{cyan} %clr{:}{faint} %m%n%xwEx"/>
+        </Appender>
+        <!--System file appender-->
+        <Appender type="RollingFile" name="LOG_TO_FILE_SYSTEM" fileName="${filePath}/system.txt" filePattern="${filePath}/system_%i.txt">
+            <Layout type="PatternLayout" pattern="%d{yyyy-MM-dd HH:mm:ss} %level --- [%t] %c{1}.%M : %m%n%xwEx"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100Mb" />
+            </Policies>
+        </Appender>
+        <!--Spring file appender-->
+        <Appender type="RollingFile" name="LOG_TO_FILE_SPRING" fileName="${filePath}/spring.txt" filePattern="${filePath}/spring_%i.txt">
+            <Layout type="PatternLayout" pattern="%d{yyyy-MM-dd HH:mm:ss} %level --- [%t] %c{1}.%M : %m%n%xwEx"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100Mb" />
+            </Policies>
+        </Appender>
+    </Appenders>
+    <Loggers>
+        <!--System logger-->
+        <Logger name="net.movies" level="all" additivity="false">
+            <AppenderRef ref="LOG_TO_CONSOLE"/>
+            <AppenderRef ref="LOG_TO_FILE_SYSTEM"/>
+        </Logger>
+        <!--Root logger-->
+        <Root level="info">
+            <AppenderRef ref="LOG_TO_CONSOLE"/>
+            <AppenderRef ref="LOG_TO_FILE_SPRING"/>
+        </Root>
+    </Loggers>
+</Configuration>

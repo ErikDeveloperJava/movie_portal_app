@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+	<title th:if="${#strings.equals(user.role,'USER')}" th:text="${user.name}">Title</title>
+	<title th:if="${#strings.equals(user.role,'ANONYMOUS')}" th:text="#{title}">Title</title>
+
+	<!-- Google font -->
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CMuli:400,700" rel="stylesheet">
+
+	<!-- Bootstrap -->
+	<link type="text/css" rel="stylesheet" th:href="@{/resources/movie_style/css/bootstrap.min.css}" />
+
+	<link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+	<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+
+	<!-- Font Awesome Icon -->
+	<link rel="stylesheet" th:href="@{/resources/movie_style/css/font-awesome.min.css}">
+
+	<link rel="stylesheet" th:href="@{/resources/movie_style/pagination/main.css}">
+	<link rel="stylesheet" th:href="@{/resources/movie_style/button/main.css}">
+
+	<!-- Custom stlylesheet -->
+	<link type="text/css" rel="stylesheet" th:href="@{/resources/movie_style/css/style.css}" />
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+		  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+		  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+</head>
+
+<body>
+	<!-- HEADER -->
+	<header id="header">
+		<!-- NAV -->
+		<div id="nav">
+			<!-- Top Nav -->
+			<div id="nav-top">
+				<div class="container">
+					<!-- social -->
+					<ul class="nav-social" th:if="${#strings.equals(user.role,'USER')}">
+						<li><a href="#"></a></li>
+						<li><a href="#" th:text="${user.name}"></a></li>
+						<li><a href="#"></a></li>
+					</ul>
+					<!-- /social -->
+
+					<!-- logo -->
+					<div class="nav-logo">
+						<a th:href="@{/}" class="logo"><img th:src="@{/resources/movie_style/img/logo.png}" alt=""></a>
+					</div>
+					<!-- /logo -->
+
+					<!-- search & aside toggle -->
+					<div class="nav-btns">
+						<button class="search-btn"><i class="fa fa-search"></i></button>
+						<div id="nav-search">
+							<form th:action="@{/movie/search}" method="post">
+								<input class="input" style="width: 100%" name="title" th:placeholder="#{search} + ' . . .'">
+								<button class="button  search" th:text="#{search}"></button>
+							</form>
+							<button type="submit" class="nav-close search-close">
+								<span></span>
+							</button>
+						</div>
+					</div>
+					<!-- /search & aside toggle -->
+				</div>
+			</div>
+			<!-- /Top Nav -->
+
+			<!-- Main Nav -->
+			<div id="nav-bottom">
+				<div class="container">
+					<!-- nav -->
+					<ul class="nav-menu">
+						<li><a th:href="@{/}" th:text="#{title}">Home</a></li>
+						<li class="has-dropdown megamenu">
+							<a href="#" th:text="#{movies}">Movies</a>
+							<div class="dropdown tab-dropdown">
+								<div class="row">
+									<div class="col-md-2">
+										<ul class="tab-nav">
+											<th:block th:each="genre : ${page.genericPage.genres}">
+												<li th:if="${genreStat.index eq 0} and ${#strings.equals(#locale.language,'en')}" class="active"><a data-toggle="tab" href="#tab1" th:text="${genre.name}">Genre</a></li>
+												<li th:if="${genreStat.index eq 0} and ${#strings.equals(#locale.language,'ru')}" class="active"><a data-toggle="tab" href="#tab1" th:text="${genre.ruName}">Genre</a></li>
+												<li th:if="${genreStat.index eq 0} and ${#strings.equals(#locale.language,'arm')}" class="active"><a data-toggle="tab" href="#tab1" th:text="${genre.armName}">Genre</a></li>
+												<li th:if="${genreStat.index ne 0} and ${#strings.equals(#locale.language,'en')}"><a data-toggle="tab" th:href="'#tab' + ${genreStat.index + 1}" th:text="${genre.name}">Genre</a></li>
+												<li th:if="${genreStat.index ne 0} and ${#strings.equals(#locale.language,'ru')}"><a data-toggle="tab" th:href="'#tab' + ${genreStat.index + 1}" th:text="${genre.ruName}">Genre</a></li>
+												<li th:if="${genreStat.index ne 0} and ${#strings.equals(#locale.language,'arm')}"><a data-toggle="tab" th:href="'#tab' + ${genreStat.index + 1}" th:text="${genre.armName}">Genre</a></li>
+											</th:block>
+										</ul>
+									</div>
+									<div class="col-md-10">
+										<div class="dropdown-body tab-content">
+											<!-- tabs -->
+											<th:block th:each="map : ${page.genericPage.movieMap}">
+												<div th:id="${map.key}" th:class="'tab-pane fade in' + ${mapStat.index eq 0 ? ' active' : ''} ">
+													<div class="row">
+														<!-- posts -->
+														<th:block th:each="movie : ${map.value}">
+															<div class="col-md-4">
+																<div class="post post-sm">
+																	<a class="post-img" th:href="@{/movie/{id}(id = ${movie.id})}">
+																		<img height="310" th:src="@{/resources/images/movies/{name}(name = ${movie.profileImage})}" alt="">
+																	</a>
+																	<div class="post-body">
+																		<div class="post-category">
+																			<a th:text="${movie.producer}">Producer</a>
+																		</div>
+																		<h3 class="post-title title-sm">
+																			<a th:href="@{/movie/{id}(id = ${movie.id})}" th:text="${movie.title}">Title</a>
+																		</h3>
+																		<ul class="post-meta">
+																			<li><a th:text="#{premiere.date}">Premier of date</a></li>
+																			<li th:text="${#dates.format(movie.premierDate,'yyyy-MM-dd')}"></li>
+																		</ul>
+																	</div>
+																</div>
+															</div>
+														</th:block>
+													</div>
+												</div>
+											</th:block>
+										</div>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li class="has-dropdown">
+							<a th:text="#{genres}">Home</a>
+							<div class="dropdown">
+								<div class="dropdown-body">
+									<ul class="dropdown-list">
+										<th:block th:each="genre : ${page.genericPage.genres}">
+											<li th:if="${#strings.equals(#locale.language,'en')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.name}">gernre</a></li>
+											<li th:if="${#strings.equals(#locale.language,'ru')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.ruName}">genre</a></li>
+											<li th:if="${#strings.equals(#locale.language,'arm')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.armName}">genre</a></li>
+										</th:block>
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li class="has-dropdown">
+							<a href="#" th:text="#{languages}">languages</a>
+							<div class="dropdown">
+								<div class="dropdown-body">
+									<ul class="dropdown-list">
+										<ul class="dropdown-list">
+											<li th:unless="${#strings.equals(#locale.language,'en')}"><a th:href="@{{uri}(lang = en,uri=${#request.getRequestURI()})}" th:text="#{english}">en</a></li>
+											<li th:if="${#strings.equals(#locale.language,'en')}"><a th:text="#{english}">en</a></li>
+											<li th:unless="${#strings.equals(#locale.language,'ru')}"><a th:href="@{{uri}(lang = ru,uri=${#request.getRequestURI()})}" th:text="#{russian}">ru</a></li>
+											<li th:if="${#strings.equals(#locale.language,'ru')}"><a th:text="#{russian}">ru</a></li>
+											<li th:unless="${#strings.equals(#locale.language,'arm')}"><a th:href="@{{uri}(lang = arm,uri=${#request.getRequestURI()})}" th:text="#{armenian}">arm</a></li>
+											<li th:if="${#strings.equals(#locale.language,'arm')}"><a th:text="#{armenian}">arm</a></li>
+										</ul>
+
+									</ul>
+								</div>
+							</div>
+						</li>
+						<li th:if="${#strings.equals(user.role,'USER')}">
+							<a th:href="@{/bookmark/all}" th:text="#{bookmark} + '(' + ${page.genericPage.bookmarks} + ')'"></a>
+						</li>
+						<li th:if="${#strings.equals(user.role,'ANONYMOUS')}">
+							<a th:href="@{/login}" th:text="#{login}"></a>
+						</li>
+						<li th:if="${#strings.equals(user.role,'ANONYMOUS')}">
+							<a th:href="@{/register}" th:text="#{register}"></a>
+						</li>
+						<li th:if="${#strings.equals(user.role,'USER')}">
+							<form action="/logout" method="post">
+								<button class="button  arrow" th:text="#{logout}">Read more</button>
+							</form>
+						</li>
+					</ul>
+					<!-- /nav -->
+				</div>
+			</div>
+		</div>
+	</header>
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div id="hot-post" class="row hot-post">
+				<div class="col-md-8 hot-post-left">
+					<!-- post -->
+					<div class="post post-thumb">
+						<a class="post-img"><img th:src="@{/resources/movie_style/img/hot-post-1.jpg}" alt=""></a>
+					</div>
+					<!-- /post -->
+				</div>
+				<div class="col-md-4 hot-post-right">
+					<!-- post -->
+					<div class="post post-thumb">
+						<a class="post-img">
+							<img th:src="@{/resources/movie_style/img/hot-post-2.jpg}" alt="">
+						</a>
+					</div>
+					<!-- /post -->
+
+					<!-- post -->
+					<div class="post post-thumb">
+						<a class="post-img">
+							<img th:src="@{/resources/movie_style/img/hot-post-3.jpg}" alt="">
+						</a>
+					</div>
+					<!-- /post -->
+				</div>
+			</div>
+			<!-- /row -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /SECTION -->
+
+	<!-- SECTION -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div class="row">
+				<div class="col-md-8">
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-12">
+							<div class="section-title">
+								<h2 th:if="${genre ne null} and ${#strings.equals(#locale.language,'en')}" class="title" th:text="#{search.by.genre} + ': ' + ${genre.name}">Search by genre</h2>
+								<h2 th:if="${genre ne null} and ${#strings.equals(#locale.language,'ru')}" class="title" th:text="#{search.by.genre} + ': ' + ${genre.ruName}">Search by genre</h2>
+								<h2 th:if="${genre ne null} and ${#strings.equals(#locale.language,'arm')}" class="title" th:text="#{search.by.genre} + ': ' + ${genre.armName}">Search by genre</h2>
+								<h2 th:if="${title ne null} and ${#lists.size(page.moviesPage.movies) > 0}" class="title" th:text="#{search.by.title} + ': ' + ${title}">Search by title</h2>
+								<h2 th:if="${title ne null} and ${#lists.size(page.moviesPage.movies) eq 0}" class="title" th:text="#{search.by.title.error} + ': ' + ${title}">Search by title</h2>
+							</div>
+						</div>
+						<th:block th:each="movie : ${page.moviesPage.movies}">
+							<div class="col-md-6">
+								<div class="post">
+									<a class="post-img" th:href="@{/movie/{id}(id=${movie.id})}">
+										<img width="100" height="390" th:src="@{/resources/images/movies/{name}(name = ${movie.profileImage})}">
+									</a>
+									<div class="post-body">
+										<div class="post-category">
+											<a th:text="${movie.producer}">Producer</a>
+										</div>
+										<h3 class="post-title">
+											<a th:href="@{/movie/{id}(id=${movie.id})}" th:text="${movie.title}">Title</a>
+										</h3>
+										<ul class="post-meta">
+											<li><a th:text="#{premiere.date}">premier of date</a></li>
+											<li th:text="${movie.premierDate}">date</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<th:block th:if="${movieStat.index ne 0} and ${movieStat.index / 2 eq 0}">
+								<div class="clearfix visible-md visible-lg"></div>
+							</th:block>
+						</th:block>
+					</div>
+					<!-- /row -->
+
+					<!-- row -->
+					<div class="row">
+						<div class="col-md-12">
+							<div class="section-title">
+								<div class="pagination-wrapper">
+									<div class="pagination">
+										<a th:if="${pages eq 0}  or ${pages} > ${page.moviesPage.arrayPage.length - 1 }" class="prev page-numbers" href="#" th:text="#{prev}">prev</a>
+										<a th:if="${pages ne 0} and ${pages} < ${page.moviesPage.arrayPage.length}" class="prev page-numbers" th:href="@{{uri}(page=${pages},uri = ${#request.getRequestURI()})}" th:text="#{prev}">prev</a>
+										<th:block th:each="p : ${page.moviesPage.arrayPage}">
+											<span th:if="${pages} eq ${pStat.index}" aria-current="page" class="page-numbers current" th:text="${pStat.index + 1}">pages</span>
+											<a th:if="${pages} ne ${pStat.index}" class="page-numbers" th:href="@{{uri}(page=${pStat.index + 1},uri = ${#request.getRequestURI()})}" th:text="${pStat.index + 1}">page</a>
+										</th:block>
+										<a th:if="${pages} eq ${page.moviesPage.arrayPage.length - 1} or ${pages} > ${page.moviesPage.arrayPage.length -1}" class="next page-numbers" href="#" th:text="#{next}">next</a>
+										<a th:if="${pages} < ${page.moviesPage.arrayPage.length - 1}" class="next page-numbers" th:href="@{{uri}(pages = ${pages + 2},uri = ${#request.getRequestURI()})}" th:text="#{next}">next</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<!-- ad widget-->
+					<div class="aside-widget text-center">
+					</div>
+					<!-- social widget -->
+					<div class="aside-widget">
+						<div class="section-title">
+							<h2 class="title" th:text="#{social.media}">Social Media</h2>
+						</div>
+						<div class="social-widget">
+							<ul>
+								<li>
+									<a href="http://www.facebook.com" class="social-facebook">
+										<i class="fa fa-facebook"></i>
+										<span>Facebook</span>
+									</a>
+								</li>
+								<li>
+									<a href="http://www.google.com" class="social-twitter">
+										<i class="fa fa-twitter"></i>
+										<span>Google+</span>
+									</a>
+								</li>
+								<li>
+									<a href="https://twitter.com" class="social-google-plus">
+										<i class="fa fa-google-plus"></i>
+										<span>Twitter</span>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!-- /social widget -->
+
+					<!-- category widget -->
+					<div class="aside-widget">
+						<div class="section-title">
+							<h2 class="title" th:text="#{genres}">Genres</h2>
+						</div>
+						<div class="category-widget">
+							<ul>
+								<th:block th:each="genre : ${page.genericPage.genres}">
+									<li th:if="${#strings.equals(#locale.language,'en')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.name}">gernre</a></li>
+									<li th:if="${#strings.equals(#locale.language,'ru')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.ruName}">genre</a></li>
+									<li th:if="${#strings.equals(#locale.language,'arm')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.armName}">genre</a></li>
+								</th:block>
+							</ul>
+						</div>
+					</div>
+
+					<div class="aside-widget">
+					</div>
+
+					<div class="aside-widget">
+						<div class="section-title">
+							<h2 class="title" th:text="#{popular.movies}">Popular movie</h2>
+						</div>
+
+						<th:block th:each="movie : ${page.topMovies}">
+							<div class="post post-widget">
+								<a class="post-img" th:href="@{/movie/{id}(id=${movie.id})}">
+									<img width="240" height="200" th:src="@{/resources/images/movies/{name}(name = ${movie.profileImage})}">
+								</a>
+								<div class="post-body">
+									<div class="post-category">
+										<a th:href="@{/movie/year/{year}(year = ${movie.year})}" th:text="${movie.year}"></a>
+									</div>
+									<h3 class="post-title">
+										<a th:href="@{/movie/{id}(id=${movie.id})}" th:text="${movie.title}">Title</a>
+									</h3>
+								</div>
+							</div>
+						</th:block>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section">
+		<div class="container">
+		</div>
+	</div>
+
+
+	<!-- FOOTER -->
+	<footer id="footer">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="footer-widget">
+						<div class="footer-logo">
+							<a th:href="@{/}" class="logo">
+								<img th:src="@{/resources/movie_style/img/logo.png}" alt="">
+							</a>
+						</div>
+						<p>
+							Рады приветствовать всех любителей интересного и качественного кино на нашем сайте! Вы любите кинематограф также как мы? Постоянно следите за выходом новинок? Не проходит ни одного вечера, чтобы вы не посмотрели пару-тройку фильмов? Тогда вы пришли точно по адресу! В нашем кинотеатре можно <strong>смотреть фильмы онлайн бесплатно</strong> и без каких-либо ограничений!
+						</p>
+						<ul class="contact-social">
+							<li><a href="http://www.facebook.com" class="social-facebook"><i class="fa fa-facebook"></i></a></li>
+							<li><a href="http://www.twitter.com" class="social-twitter"><i class="fa fa-twitter"></i></a></li>
+							<li><a href="http://www.google.com" class="social-instagram"><i class="fa fa-instagram"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="footer-widget">
+						<h3 class="footer-title" th:text="#{genres}">Genres</h3>
+						<div class="tags-widget">
+							<ul>
+								<th:block th:each="genre : ${page.genericPage.genres}">
+									<li th:if="${#strings.equals(#locale.language,'en')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.name}">gernre</a></li>
+									<li th:if="${#strings.equals(#locale.language,'ru')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.ruName}">genre</a></li>
+									<li th:if="${#strings.equals(#locale.language,'arm')}"><a th:href="@{/movie/genre/{id}(id = ${genre.id})}" th:text="${genre.armName}">genre</a></li>
+								</th:block>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="footer-bottom row">
+				<div class="col-md-6 col-md-pull-6">
+					<div class="footer-copyright">
+						Movie.net&copy;<script>document.write(new Date().getFullYear());</script> All rights reserved<i class="fa fa-heart-o" aria-hidden="true"></i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<script th:src="@{/resources/movie_style/js/jquery.min.js}"></script>
+	<script th:src="@{/resources/movie_style/js/bootstrap.min.js}"></script>
+	<script th:src="@{/resources/movie_style/js/jquery.stellar.min.js}"></script>
+	<script th:src="@{/resources/movie_style/js/main.js}"></script>
+
+</body>
+
+</html>
