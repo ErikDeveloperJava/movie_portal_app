@@ -1,1 +1,1 @@
-Project on Spring Boot
+Movie portal on Spring Boot
